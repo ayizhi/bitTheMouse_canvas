@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+
+        canvas{
+            border:1px solid #000000;
+            background: url("images/bg_canvas.png");
+            background-size:100% 100%
+            cursor:hidden;
+        }
+
+    </style>
+</head>
+<body>
+<canvas id='canvas' width = "750" height="550"></canvas>
+
+<!--<img id = "hammer"  src="images/hammer.png" alt=""/>-->
+
+<audio src="audio/game_music.ogg"></audio>
+<audio src="audio/game_pass.ogg"></audio>
+<audio id='miss' src="audio/no_hit.ogg"></audio>
+<audio src="audio/over_music.ogg"></audio>
+<audio src="audio/second_music.ogg"></audio>
+<audio id ="pia" src="audio/pa.wav"></audio>
+
+<script src = "js/underscore.js"></script>
+<script src = "js/game.js"></script>
+<script src = "js/mouse.js"></script>
+<script src = "js/funkland.js"></script>
+<script src = "js/score.js"></script>
+<script src = "js/tttt.js"></script>
+
+<script>
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    var missMic = document.getElementById("miss");
+    var piaMia = document.getElementById("pia");
+    var hammer = document.getElementById("hammer");
+    var miss = document.getElementById("miss")
+
+    var imageURLArr = ["images/bg_gameover.png","images/bg_hole.png","images/hammer.png","images/help.png","images/icon.png","images/mouse.png","images/next.png"];
+    var imageArr = []
+    var time = 30;
+    var frameNum = 0;
+    var FPS = 50;
+    var alreadyNum = 0;
+    var game = new Game();
+    var fuckland = new Fuckland();
+    var zongfen = 0;
+    var scoreArr = []
+
+    //地鼠从地面出来
+    for(var i=0;i<imageURLArr.length;i++){
+        imageArr[i] = new Image();
+        imageArr[i].src = imageURLArr[i];
+        imageArr[i].onload = function(){
+            alreadyNum++;
+            ctx.clearRect(0,0,10000,10000);
+            ctx.font = "20px 微软雅黑";
+            ctx.fillText("正在加载资源"+alreadyNum+"/"+imageURLArr.length,20,30)
+            if(alreadyNum == imageURLArr.length){
+                game.run();
+                //开始打
+
+            }
+        }
+    }
+    var ttt = null;
+    canvas.onmousemove = function(e){
+        var Tx = e.offsetX - 50;
+        var Ty = e.offsetY - 30;
+        ttt = new T(Tx,Ty)
+//        hammer.style.left = Tx + "px";
+//        hammer.style.top = Ty + 'px';
+    }
+    canvas.onmouseover = function(){
+        document.body.style.cursor = "hidden"
+    }
+
+
+
+
+    canvas.onmousedown = function(e){
+        var x = e.offsetX;
+        var y = e.offsetY;
+
+        for(var i = 0;i<mouseArr.length;i++){
+            if(x<mouseArr[i].x+mouseArr[i].wL && x>mouseArr[i].x){
+                if(y<mouseArr[i].y+mouseArr[i].hL && y>mouseArr[i].y){
+                    mouseArr[i].hitted()
+                    piaMia.load();
+                    piaMia.play();
+                    zongfen = zongfen + mouseArr[i].score;
+                    zongfen = parseInt(zongfen * mouseArr[i].more);
+                    var mouseScore = mouseArr[i].score
+                    var mouseMore  = mouseArr[i].more
+
+                    for(var r=0;r<scoreLocation.length;r++){
+                        var thisScore = scoreLocation[r]
+                        if((scoreLocation[r]["score"] == mouseScore && scoreLocation[r]["add"] == 1)||(scoreLocation[r]["score"] == 0 &&  scoreLocation[r]["add"] == mouseMore)){
+
+//                            ctx.drawImage(imageArr[4],thisScore["imgX"],thisScore["imgY"],thisScore["w"],thisScore["h"],x,y,thisScore["w"],thisScore["h"])
+                            console.log(r,thisScore["imgX"],thisScore["score"])
+                            scoreArr.push( new Score({
+                                    imgx:thisScore["imgX"],
+                                    imgy:thisScore["imgY"],
+                                    w:thisScore["w"],
+                                    H:thisScore["h"],
+                                    x:x,
+                                    y:y,
+                                }))
+                            console.log(scoreArr)
+                        }
+                    }
+
+                }
+                else{
+                    miss.load();
+                    miss.play();
+                }
+            }
+            else{
+                miss.load();
+                miss.play();
+            }
+        }
+    }
+        var scoreLocation =[
+            {imgX:0,   imgY:0, w:120,  h:71, score:500, add:1},
+            {imgX:120, imgY:0,  w:77,   h:71, score:0,   add:0.5},
+            {imgX:197, imgY:0,  w:120,  h:71, score:-100,add:1},
+            {imgX:317, imgY:0,  w:120,  h:71, score:100, add:1},
+            {imgX:0,   imgY:71, w:120,  h:71, score:0,   add:1.2}
+        ]
+
+
+
+</script>
+
+
+
+</body>
+</html>
